@@ -18,8 +18,10 @@ type EmailPayload = {
   attachments?: { filename: string; content: Buffer }[];
 };
 
-const FROM = process.env.CONTACT_FROM_EMAIL ?? "website@sprightsoft.com";
-const TO = process.env.CONTACT_TO_EMAIL ?? "hr@sprightsoft.com";
+// `||`, not `??`: a declared-but-blank variable must fall back too, or
+// enquiries are addressed to an empty string and vanish silently.
+const FROM = process.env.CONTACT_FROM_EMAIL?.trim() || "website@sprightsoft.com";
+const TO = process.env.CONTACT_TO_EMAIL?.trim() || "hr@sprightsoft.com";
 
 export async function deliver(payload: EmailPayload): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;

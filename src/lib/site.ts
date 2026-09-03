@@ -4,9 +4,47 @@
  * nothing is invented. Update this file, not the components.
  */
 
-export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  "https://www.sprightsoft.com";
+const DEFAULT_SITE_URL = "https://www.sprightsoft.com";
+
+/**
+ * Resolve the canonical origin.
+ *
+ * `??` is not enough. A host that declares NEXT_PUBLIC_SITE_URL but leaves
+ * the value blank hands us an empty string — which `??` does not catch,
+ * because the variable IS defined — and `new URL("")` then throws
+ * ERR_INVALID_URL inside metadataBase while Next collects page data, failing
+ * the entire build. Next reports it as "Failed to collect configuration for
+ * /_not-found", which points nowhere near the cause.
+ *
+ * So: try each candidate, skip anything empty once trimmed, give a bare host
+ * a scheme (Vercel supplies `example.vercel.app`, not a URL), and fall back
+ * rather than throwing if none of them parse.
+ */
+function resolveSiteUrl(): string {
+  const candidates = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.NEXT_PUBLIC_VERCEL_URL,
+    process.env.VERCEL_URL,
+    DEFAULT_SITE_URL,
+  ];
+
+  for (const candidate of candidates) {
+    const trimmed = candidate?.trim().replace(/\/$/, "");
+    if (!trimmed) continue;
+
+    const withScheme = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+
+    try {
+      return new URL(withScheme).origin;
+    } catch {
+      // Unparseable — try the next candidate.
+    }
+  }
+
+  return DEFAULT_SITE_URL;
+}
+
+export const siteUrl = resolveSiteUrl();
 
 export const site = {
   name: "Spright Software Systems",
