@@ -1,0 +1,124 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================================
+ * SPRIGHT — visual system rebuilt against the Copora reference.
+ *
+ * Three surfaces carry the whole site, alternating down the page exactly as
+ * the reference does: white, mist (#F5F5F5), and one near-black section that
+ * lands mid-page. Everything else is type and photography.
+ * ========================================================================== */
+
+@layer base {
+  :root {
+    --header-height: 96px; /* reference nav measures 96px */
+  }
+
+  * {
+    @apply border-mist-line;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper text-ink-500 font-sans antialiased;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Headings sit at 500 with normal tracking. This is the reference's
+     defining typographic choice — see tailwind.config.ts. */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium text-ink;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-cobalt ring-offset-2 ring-offset-paper;
+  }
+
+  .on-ink :focus-visible {
+    @apply ring-cobalt-bright ring-offset-ink-900;
+  }
+
+  ::selection {
+    @apply bg-ink text-paper;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .skip-link {
+    @apply absolute left-4 top-4 z-[100] -translate-y-24 rounded-card bg-ink px-4 py-3 text-meta font-medium text-paper transition-transform focus-visible:translate-y-0;
+  }
+
+  .rule {
+    @apply h-px w-full bg-mist-line;
+  }
+
+  .rule-on-ink {
+    @apply h-px w-full bg-white/12;
+  }
+
+  /* Link underline that wipes in from the left. */
+  .link-underline {
+    @apply relative inline-block after:absolute after:bottom-[-2px] after:left-0 after:h-px after:w-full after:origin-right after:scale-x-0 after:bg-current after:transition-transform after:duration-500 after:ease-editorial hover:after:origin-left hover:after:scale-x-100;
+  }
+
+  /* Small caps label that opens most sections in the reference. */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-eyebrow font-medium uppercase tracking-[0.14em] text-ink-400;
+  }
+
+  .eyebrow::before {
+    content: "";
+    @apply inline-block h-1.5 w-1.5 rounded-full bg-cobalt;
+  }
+
+  /* Media wrapper: 8px on anything substantial, 4px on thumbnails. */
+  .media {
+    @apply relative overflow-hidden rounded-card bg-mist;
+  }
+
+  .media img {
+    @apply transition-transform duration-[900ms] ease-editorial;
+  }
+
+  .group:hover .media img {
+    transform: scale(1.035);
+  }
+
+  .media-thumb {
+    @apply relative overflow-hidden rounded-thumb bg-mist;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .text-pretty { text-wrap: pretty; }
+
+  /* Page gutter — reference is a 1500px shell on a 30px gutter. */
+  .gutter {
+    @apply mx-auto w-full max-w-shell px-5 sm:px-8 lg:px-[30px];
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .group:hover .media img { transform: none; }
+}
